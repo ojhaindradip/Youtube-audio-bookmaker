@@ -1,0 +1,48 @@
+name: Build Android APK
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node.js-version: 18
+
+      - name: Install Cordova CLI
+        run: npm install -g cordova
+
+      - name: Initialize Android Project
+        run: |
+          cordova create myApp com.novelfire.app NovelFireStudio
+          cd myApp
+          cordova platform add android --noscript
+
+      - name: Deploy HTML Assets
+        run: |
+          rm -rf myApp/www/*
+          cp index.html myApp/www/
+
+      - name: Install Android Build SDK Tools
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Java Development Kit
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Compile Application Package
+        run: |
+          cd myApp
+          cordova build android --device --debug
+
+      - name: Export Completed APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NovelFire-Release-APK
+          path: myApp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
