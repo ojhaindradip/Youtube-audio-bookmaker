@@ -11,7 +11,7 @@ jobs:
       - name: Set up Node.js Environment
         uses: actions/setup-node@v4
         with:
-          node.js-version: 18
+          node-version: 18
 
       - name: Install Cordova CLI
         run: npm install -g cordova
